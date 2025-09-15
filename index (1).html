@@ -1,0 +1,86 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nobert Kemboi - Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-blue-600 text-white text-center py-8">
+        <h1 class="text-4xl font-bold">Nobert Kemboi</h1>
+        <p class="text-xl mt-2">Aspiring Data Analyst Transforming Data into Actionable Insights</p>
+    </header>
+    <main class="max-w-4xl mx-auto p-6">
+        <section class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-blue-600">About Me</h2>
+            <p class="mt-4 text-gray-700">
+                Hi, I'm Nobert Kemboi, an aspiring Data Analyst passionate about uncovering insights from data to drive business success in Kenya and beyond. I specialize in Python, SQL, and Tableau to create user-friendly visualizations, such as dashboards for e-commerce platforms. My leadership in community projects, like Rotaract Club, fuels my commitment to impactful, data-driven solutions.
+            </p>
+        </section>
+        <section class="bg-white shadow-md rounded-lg p-6 mb-6">
+            <h2 class="text-2xl font-semibold text-blue-600">Skills</h2>
+            <ul class="mt-4 text-gray-700 list-disc list-inside">
+                <li>Data Analysis: Python, SQL, R</li>
+                <li>Visualization: Tableau, Power BI</li>
+                <li>Tools: Excel, Jupyter Notebook, Kaggle</li>
+                <li>Collaboration: Presenting insights to diverse stakeholders</li>
+            </ul>
+        </section>
+        <section class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-semibold text-blue-600">Projects</h2>
+            <p class="mt-4 text-gray-700">
+                <strong>E-Commerce Sales Dashboard</strong>: Developed a Tableau dashboard analyzing sales trends to optimize inventory for a Kenyan online retailer. (Placeholder: Add your project details or GitHub link here.)
+            </p>
+            <!-- Add more projects as you complete them -->
+        </section>
+        <!-- Optional Photo Section -->
+        <section class="bg-white shadow-md rounded-lg p-6 mt-6">
+            <h2 class="text-2xl font-semibold text-blue-600">Profile Photo</h2>
+            <img src="path-to-your-photo.jpg" alt="Nobert Kemboi" class="mt-4 rounded-full w-32 h-32 mx-auto">
+        </section>
+    </main>
+    <footer class="bg-blue-600 text-white text-center py-4">
+        <p>Contact: nobertkemboi85@gmail.com | <a href="https://www.linkedin.com/in/nobert-kemboi" class="underline">LinkedIn</a></p>
+    </footer>
+</body>
+</html>
